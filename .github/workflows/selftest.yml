@@ -1,0 +1,39 @@
+# Uses the action the way a customer does — by its published tag, not a local
+# path — against a real record signed by production today, and against the
+# same record with one event altered. Green means v1 verifies what Runback
+# signs and refuses what it didn't.
+name: selftest
+on:
+  push:
+  schedule:
+    - cron: "17 3 * * 1"   # weekly: catches a verifier release that breaks v1
+  workflow_dispatch:
+
+jobs:
+  genuine-record-passes:
+    runs-on: ubuntu-latest
+    steps:
+      - run: curl -sf https://runback.dev/sample-cassette.json -o record.json
+      - id: verify
+        uses: letsRunback/verify-action@v1
+        with:
+          path: record.json
+      - run: |
+          echo "verdict=${{ steps.verify.outputs.verdict }} checked=${{ steps.verify.outputs.checked }}"
+          [ "${{ steps.verify.outputs.verdict }}" = valid ] || { echo "::error::a genuine record did not verify"; exit 1; }
+
+  tampered-record-fails:
+    runs-on: ubuntu-latest
+    steps:
+      - run: curl -sf https://runback.dev/sample-cassette.json -o record.json
+      - name: alter one event
+        run: node -e "const f=require('fs');const d=JSON.parse(f.readFileSync('record.json'));d.events[0].payload={tampered:true};f.writeFileSync('record.json',JSON.stringify(d))"
+      - id: verify
+        continue-on-error: true
+        uses: letsRunback/verify-action@v1
+        with:
+          path: record.json
+      - run: |
+          echo "outcome=${{ steps.verify.outcome }} verdict=${{ steps.verify.outputs.verdict }}"
+          [ "${{ steps.verify.outcome }}" = failure ] && [ "${{ steps.verify.outputs.verdict }}" = invalid ] \
+            || { echo "::error::a tampered record was not rejected"; exit 1; }
