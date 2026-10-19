@@ -1,9 +1,7 @@
 name: "Runback Verify"
-description: >-
-  Verify the tamper-evidence and signature of Runback audit records
-  (runback.cassette/v1) in CI — the same @runback/verify check anyone can
-  run with no account, wired into a workflow so a broken or unsigned export
-  fails the build instead of being noticed later.
+# The Marketplace rejects a description over 125 characters. The longer
+# account of what this checks is in README.md.
+description: "Verify Runback audit records in CI: hash chain and signature, checked offline with no account."
 author: "Runback"
 branding:
   icon: "shield"
