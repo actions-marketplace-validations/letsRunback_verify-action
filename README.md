@@ -8,7 +8,7 @@ being noticed later. No account, no API key.
 ## Usage
 
 ```yaml
-- uses: letsRunback/runback-verify-action@v1   # NOT YET PUBLISHED — see "Publishing" below
+- uses: letsRunback/verify-action@v1
   with:
     path: "audit-exports/**/*.json"
 ```
@@ -39,21 +39,10 @@ remember to run.
 
 ## Publishing (maintainer notes)
 
-This source lives inside the main `stepback` monorepo for development, but a
-GitHub Marketplace listing requires `action.yml` at the **root** of its own
-public repository. To publish:
-
-1. Copy `action.yml`, `verify.sh`, and this `README.md` to the root of the
-   public `letsRunback/runback-verify-action` repo (or push this directory's
-   contents there via `git subtree split`/`git filter-repo` to preserve
-   history).
-2. Enable **Settings → General → Features → Dependency graph** on that repo
-   and on `letsRunback/runback-proofs` (the `@runback/verify` source) — this
-   is what makes GitHub's "Used by N repositories" surface work, and is a
-   one-time settings toggle, not something a CI job can do.
-3. Tag a release (`v1`, `v1.0.0`) and follow GitHub's own
-   ["Publish an action to the Marketplace"](https://docs.github.com/en/actions/creating-actions/publishing-actions-in-github-marketplace)
-   flow to list it. GitHub asks for a Marketplace category and a signed-in
-   maintainer to click through the listing form — no CLI path exists for
-   this step.
-4. Once published, link it from `/verify` and `/docs` on the marketing site.
+Developed here, published to the public [`letsRunback/verify-action`](https://github.com/letsRunback/verify-action),
+because a Marketplace listing needs `action.yml` at the root of its own public
+repository. `.github/workflows/mirror-verify-action.yml` copies this directory
+there on a `verify-action-v*` tag and moves the `v1` major tag users pin to.
+v1.0.0 was published on 2026-10-19. The Marketplace listing itself is a
+one-time click on the release ("Publish this Action to the GitHub
+Marketplace"); there is no API for it.
